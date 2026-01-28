@@ -18,12 +18,16 @@ class DataManager: ObservableObject {
         } else {
             self.userProfile = UserProfile(
                 name: "Atleta",
+                email: "",
                 bodyweight: 75.0,
+                height: 175.0,
+                age: 0,
+                athleteLevel: .beginner,
                 squatMax: 100.0,
                 benchMax: 80.0,
                 deadliftMax: 120.0,
                 totalLifted: 0.0,
-                hasCompletedOnboarding: true
+                hasCompletedOnboarding: false
             )
             saveUserProfile()
         }
@@ -52,6 +56,11 @@ class DataManager: ObservableObject {
         if let deadliftMax = deadliftMax {
             userProfile.deadliftMax = deadliftMax
         }
+        saveUserProfile()
+    }
+    
+    func saveProfile(_ profile: UserProfile) {
+        userProfile = profile
         saveUserProfile()
     }
     
