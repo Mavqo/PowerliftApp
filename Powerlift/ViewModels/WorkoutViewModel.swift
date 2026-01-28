@@ -52,16 +52,14 @@ class WorkoutViewModel: ObservableObject {
     
     // MARK: - Add Working Set
     func addWorkingSet(weight: Double, reps: Int, rpe: Double? = nil, isTopSet: Bool = false) {
+        let setNumber = workingSets.count + 1
         let set = WorkoutSet(
-            exerciseType: selectedExercise,
+            setNumber: setNumber,
             weight: weight,
             reps: reps,
-            isTopSet: isTopSet,
-            rpe: rpe,
-            notes: nil
+            rpe: rpe
         )
         workingSets.append(set)
-        dataManager.saveSet(set)
     }
     
     // MARK: - Target Top Set Weight
@@ -78,7 +76,7 @@ class WorkoutViewModel: ObservableObject {
             currentWeight: currentWeight,
             reps: reps,
             rpe: rpe,
-            athleteLevel: dataManager.userProfile.athleteLevel,
+            athleteLevel: .intermediate,
             exerciseType: selectedExercise
         )
     }
@@ -107,10 +105,7 @@ class WorkoutViewModel: ObservableObject {
             name: name,
             date: Date(),
             exerciseType: selectedExercise.displayName,
-            sets: workingSets.count,
-            videoURL: nil,
-            stats: nil,
-            duration: nil,
+            sets: workingSets,
             notes: nil
         )
         dataManager.addWorkout(workout)
