@@ -32,4 +32,9 @@ struct WorkoutSet: Codable, Identifiable {
     var volume: Double {
         return weight * Double(reps)
     }
+
+    var estimatedOneRepMax: Double {
+        guard reps > 0 else { return weight }
+        return weight * (1 + Double(reps) / 30)
+    }
 }
