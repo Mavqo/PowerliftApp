@@ -323,6 +323,50 @@ class DataManager: ObservableObject {
         
         return topSet
     }
+    
+    func getRecentSets(for exerciseType: ExerciseType, limit: Int = 20) -> [WorkoutSet] {
+        let exerciseWorkouts = workouts
+            .filter { $0.exerciseType == exerciseType.rawValue }
+            .sorted { $0.date > $1.date }
+        
+        var recentSets: [WorkoutSet] = []
+        for workout in exerciseWorkouts {
+            recentSets.append(contentsOf: workout.sets)
+            if recentSets.count >= limit {
+                break
+            }
+        }
+        
+        return Array(recentSets.prefix(limit))
+    }
+    
+    func getRecentTopSets(for exerciseType: ExerciseType, limit: Int = 10) -> [WorkoutSet] {
+        let exerciseWorkouts = workouts
+            .filter { $0.exerciseType == exerciseType.rawValue }
+            .sorted { $0.date > $1.date }
+        
+        var topSets: [WorkoutSet] = []
+        for workout in exerciseWorkouts {
+            if let topSet = workout.sets.max(by: { $0.weight < $1.weight }) {
+                topSets.append(topSet)
+            }
+            if topSets.count >= limit {
+                break
+            }
+        }
+        
+        return topSets
+    }
+    
+    func getTotalVolume(for exerciseType: ExerciseType, from startDate: Date, to endDate: Date) -> Double {
+        return workouts
+            .filter { workout in
+                workout.exerciseType == exerciseType.rawValue &&
+                workout.date >= startDate &&
+                workout.date <= endDate
+            }
+            .reduce(0.0) { $0 + $1.totalVolume }
+    }
 
     // MARK: - Personal Records
     
