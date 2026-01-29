@@ -89,17 +89,19 @@ class DataManager: ObservableObject {
         // Create a workout from video analysis
         let set = WorkoutSet(
             setNumber: 1,
-            reps: stats.totalReps,
             weight: 0, // Weight not captured from video
+            reps: stats.totalReps,
             rpe: nil,
-            notes: "Video: \(url.lastPathComponent)\nAvg Vel: \(String(format: "%.2f", stats.avgVelocity)) m/s\nMax Vel: \(String(format: "%.2f", stats.maxVelocity)) m/s\nROM: \(String(format: "%.1f", stats.rom)) cm"
+            velocity: stats.avgVelocity,
+            rom: stats.rom
         )
         
         let workout = Workout(
+            name: "Video Analysis - \(stats.exerciseType)",
+            date: Date(),
             exerciseType: stats.exerciseType,
             sets: [set],
-            date: Date(),
-            notes: "Analyzed from video"
+            notes: "Video: \(url.lastPathComponent)\nAvg Vel: \(String(format: "%.2f", stats.avgVelocity)) m/s\nMax Vel: \(String(format: "%.2f", stats.maxVelocity)) m/s\nROM: \(String(format: "%.1f", stats.rom)) cm"
         )
         
         addWorkout(workout)
