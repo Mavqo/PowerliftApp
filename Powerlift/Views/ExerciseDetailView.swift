@@ -226,11 +226,11 @@ struct ExerciseDetailSetRow: View {
         HStack(spacing: 16) {
             // Date
             VStack(alignment: .leading, spacing: 2) {
-                Text(formatDate(set.timestamp))
+                Text(formatDate(set.date))
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(AppColors.textPrimary)
                 
-                Text(formatTime(set.timestamp))
+                Text(formatTime(set.date))
                     .font(.system(size: 12))
                     .foregroundColor(AppColors.textSecondary)
             }
