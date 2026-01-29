@@ -19,4 +19,15 @@ enum ExerciseType: String, Codable, CaseIterable {
             return "⚡"
         }
     }
+    
+    var icon: String {
+        switch self {
+        case .squat:
+            return "figure.strengthtraining.traditional"
+        case .bench:
+            return "figure.strengthtraining.functional"
+        case .deadlift:
+            return "figure.mixed.cardio"
+        }
+    }
 }
