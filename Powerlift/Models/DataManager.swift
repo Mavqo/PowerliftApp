@@ -85,6 +85,26 @@ class DataManager: ObservableObject {
         saveUserProfile()
     }
     
+    func addWorkoutFromVideo(url: URL, stats: WorkoutStats) {
+        // Create a workout from video analysis
+        let set = WorkoutSet(
+            setNumber: 1,
+            reps: stats.totalReps,
+            weight: 0, // Weight not captured from video
+            rpe: nil,
+            notes: "Video: \(url.lastPathComponent)\nAvg Vel: \(String(format: "%.2f", stats.avgVelocity)) m/s\nMax Vel: \(String(format: "%.2f", stats.maxVelocity)) m/s\nROM: \(String(format: "%.1f", stats.rom)) cm"
+        )
+        
+        let workout = Workout(
+            exerciseType: stats.exerciseType,
+            sets: [set],
+            date: Date(),
+            notes: "Analyzed from video"
+        )
+        
+        addWorkout(workout)
+    }
+    
     func deleteWorkout(_ workout: Workout) {
         if let index = workouts.firstIndex(where: { $0.id == workout.id }) {
             let deletedWorkout = workouts.remove(at: index)
