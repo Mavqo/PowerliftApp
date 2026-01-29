@@ -368,11 +368,11 @@ struct EditProfileView: View {
                                 .foregroundColor(AppColors.textPrimary)
                             
                             VStack(spacing: 16) {
-                                CustomTextField(icon: "person.fill", placeholder: "Nome", text: $name)
-                                CustomTextField(icon: "envelope.fill", placeholder: "Email", text: $email)
-                                CustomTextField(icon: "scalemass.fill", placeholder: "Peso (kg)", text: $bodyweight, keyboardType: .decimalPad)
-                                CustomTextField(icon: "ruler.fill", placeholder: "Altezza (cm)", text: $height, keyboardType: .numberPad)
-                                CustomTextField(icon: "calendar", placeholder: "Età", text: $age, keyboardType: .numberPad)
+                                ProfileTextField(icon: "person.fill", placeholder: "Nome", text: $name)
+                                ProfileTextField(icon: "envelope.fill", placeholder: "Email", text: $email)
+                                ProfileTextField(icon: "scalemass.fill", placeholder: "Peso (kg)", text: $bodyweight, keyboardType: .decimalPad)
+                                ProfileTextField(icon: "ruler.fill", placeholder: "Altezza (cm)", text: $height, keyboardType: .numberPad)
+                                ProfileTextField(icon: "calendar", placeholder: "Età", text: $age, keyboardType: .numberPad)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -399,9 +399,9 @@ struct EditProfileView: View {
                                 .foregroundColor(AppColors.textPrimary)
                             
                             VStack(spacing: 16) {
-                                CustomTextField(icon: "🏋️", placeholder: "Squat Max (kg)", text: $squatMax, keyboardType: .decimalPad)
-                                CustomTextField(icon: "💪", placeholder: "Panca Max (kg)", text: $benchMax, keyboardType: .decimalPad)
-                                CustomTextField(icon: "🔥", placeholder: "Stacco Max (kg)", text: $deadliftMax, keyboardType: .decimalPad)
+                                ProfileTextField(icon: "🏋️", placeholder: "Squat Max (kg)", text: $squatMax, keyboardType: .decimalPad)
+                                ProfileTextField(icon: "💪", placeholder: "Panca Max (kg)", text: $benchMax, keyboardType: .decimalPad)
+                                ProfileTextField(icon: "🔥", placeholder: "Stacco Max (kg)", text: $deadliftMax, keyboardType: .decimalPad)
                             }
                             
                             // Totale Live
@@ -468,7 +468,8 @@ struct EditProfileView: View {
     }
 }
 
-struct CustomTextField: View {
+// MARK: - Profile Text Field
+struct ProfileTextField: View {
     let icon: String
     let placeholder: String
     @Binding var text: String
@@ -495,6 +496,6 @@ struct CustomTextField: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(AppColors.cardBackground)
-        }
+        )
     }
 }
