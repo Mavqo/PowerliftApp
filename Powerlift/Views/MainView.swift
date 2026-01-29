@@ -16,7 +16,7 @@ struct MainView: View {
                 Color.clear
                     .tag(2)
                 
-                ProgressView(dataManager: dataManager)
+                WorkoutProgressView(dataManager: dataManager)
                     .tag(3)
                 
                 ProfileView(dataManager: dataManager)
