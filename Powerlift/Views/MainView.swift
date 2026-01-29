@@ -16,10 +16,10 @@ struct MainView: View {
                 Color.clear
                     .tag(2)
                 
-                ProgressPlaceholderView(dataManager: dataManager)
+                ProgressView(dataManager: dataManager)
                     .tag(3)
                 
-                ProfilePlaceholderView(dataManager: dataManager)
+                ProfileView(dataManager: dataManager)
                     .tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
@@ -116,44 +116,6 @@ struct TabBarButton: View {
                     .foregroundColor(isSelected ? AppColors.primary : AppColors.textSecondary)
             }
             .frame(maxWidth: .infinity)
-        }
-    }
-}
-
-struct ProgressPlaceholderView: View {
-    @ObservedObject var dataManager: DataManager
-    
-    var body: some View {
-        ZStack {
-            AppColors.background.ignoresSafeArea()
-            
-            VStack {
-                Text("Progress")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(AppColors.textPrimary)
-                
-                Text("Coming Soon")
-                    .foregroundColor(AppColors.textSecondary)
-            }
-        }
-    }
-}
-
-struct ProfilePlaceholderView: View {
-    @ObservedObject var dataManager: DataManager
-    
-    var body: some View {
-        ZStack {
-            AppColors.background.ignoresSafeArea()
-            
-            VStack {
-                Text("Profile")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(AppColors.textPrimary)
-                
-                Text("Coming Soon")
-                    .foregroundColor(AppColors.textSecondary)
-            }
         }
     }
 }
