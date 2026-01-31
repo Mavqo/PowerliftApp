@@ -24,8 +24,8 @@ struct ProfileView: View {
                     ProgressRingsSection(dataManager: dataManager, animateRings: $animateRings)
                         .padding(.horizontal, 20)
                     
-                    // 📊 IPF Points (sostituisce Wilks)
-                    IPFPointsSection(dataManager: dataManager)
+                    // 📊 IPF GL Points (sostituisce Wilks)
+                    IPFGLPointsSection(dataManager: dataManager)
                         .padding(.horizontal, 20)
                     
                     // Stats Cards
@@ -314,20 +314,21 @@ struct ProgressRingLegendCustom: View {
     }
 }
 
-// MARK: - 📊 IPF Points (sostituisce Wilks Score)
-struct IPFPointsSection: View {
+// MARK: - 📊 IPF GL Points (Formula Corretta)
+struct IPFGLPointsSection: View {
     @ObservedObject var dataManager: DataManager
     
-    var ipfPoints: Double {
-        calculateIPFPoints(
+    var ipfGL: Double {
+        calculateIPFGLPoints(
             bodyweight: dataManager.userProfile.bodyweight,
             total: dataManager.userProfile.squatMax + dataManager.userProfile.benchMax + dataManager.userProfile.deadliftMax,
-            isMale: true
+            gender: dataManager.userProfile.gender,
+            equipmentType: dataManager.userProfile.equipmentType
         )
     }
     
     var ipfRating: (String, Color) {
-        switch ipfPoints {
+        switch ipfGL {
         case 0..<300: return ("Principiante", .gray)
         case 300..<450: return ("Intermedio", .blue)
         case 450..<550: return ("Avanzato", .purple)
@@ -340,11 +341,11 @@ struct IPFPointsSection: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("📊 IPF Points")
+                    Text("📊 IPF GL Points")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Coefficiente forza relativa IPF")
+                    Text("Coefficiente IPF \(dataManager.userProfile.gender.rawValue)")
                         .font(.system(size: 12))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -352,7 +353,7 @@ struct IPFPointsSection: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(String(format: "%.1f", ipfPoints))
+                    Text(String(format: "%.1f", ipfGL))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(ipfRating.1)
                     
