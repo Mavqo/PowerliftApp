@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct ProfileView: View {
     @ObservedObject var dataManager: DataManager
@@ -11,7 +12,7 @@ struct ProfileView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
-                    // Header con Avatar
+                    // Header con Avatar/Photo
                     ProfileHeader(dataManager: dataManager)
                         .padding(.top, 20)
                     
@@ -23,8 +24,8 @@ struct ProfileView: View {
                     ProgressRingsSection(dataManager: dataManager, animateRings: $animateRings)
                         .padding(.horizontal, 20)
                     
-                    // 📊 Wilks Score
-                    WilksScoreSection(dataManager: dataManager)
+                    // 📊 IPF Points (sostituisce Wilks)
+                    IPFPointsSection(dataManager: dataManager)
                         .padding(.horizontal, 20)
                     
                     // Stats Cards
@@ -313,24 +314,24 @@ struct ProgressRingLegendCustom: View {
     }
 }
 
-// MARK: - 📊 Wilks Score
-struct WilksScoreSection: View {
+// MARK: - 📊 IPF Points (sostituisce Wilks Score)
+struct IPFPointsSection: View {
     @ObservedObject var dataManager: DataManager
     
-    var wilksScore: Double {
-        calculateWilks(
+    var ipfPoints: Double {
+        calculateIPFPoints(
             bodyweight: dataManager.userProfile.bodyweight,
             total: dataManager.userProfile.squatMax + dataManager.userProfile.benchMax + dataManager.userProfile.deadliftMax,
             isMale: true
         )
     }
     
-    var wilksRating: (String, Color) {
-        switch wilksScore {
-        case 0..<200: return ("Principiante", .gray)
-        case 200..<300: return ("Intermedio", .blue)
-        case 300..<400: return ("Avanzato", .purple)
-        case 400..<500: return ("Elite", .orange)
+    var ipfRating: (String, Color) {
+        switch ipfPoints {
+        case 0..<300: return ("Principiante", .gray)
+        case 300..<450: return ("Intermedio", .blue)
+        case 450..<550: return ("Avanzato", .purple)
+        case 550..<650: return ("Elite", .orange)
         default: return ("World Class", .red)
         }
     }
@@ -339,11 +340,11 @@ struct WilksScoreSection: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("📊 Wilks Score")
+                    Text("📊 IPF Points")
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Coefficiente forza relativa")
+                    Text("Coefficiente forza relativa IPF")
                         .font(.system(size: 12))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -351,18 +352,18 @@ struct WilksScoreSection: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: 4) {
-                    Text(String(format: "%.1f", wilksScore))
+                    Text(String(format: "%.1f", ipfPoints))
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(wilksRating.1)
+                        .foregroundColor(ipfRating.1)
                     
-                    Text(wilksRating.0)
+                    Text(ipfRating.0)
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(wilksRating.1)
+                        .foregroundColor(ipfRating.1)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 4)
                         .background(
                             Capsule()
-                                .fill(wilksRating.1.opacity(0.2))
+                                .fill(ipfRating.1.opacity(0.2))
                         )
                 }
             }
@@ -372,7 +373,7 @@ struct WilksScoreSection: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
-                        colors: [wilksRating.1.opacity(0.15), wilksRating.1.opacity(0.05)],
+                        colors: [ipfRating.1.opacity(0.15), ipfRating.1.opacity(0.05)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -382,7 +383,7 @@ struct WilksScoreSection: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [wilksRating.1.opacity(0.3), wilksRating.1.opacity(0.1)],
+                        colors: [ipfRating.1.opacity(0.3), ipfRating.1.opacity(0.1)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
@@ -392,29 +393,7 @@ struct WilksScoreSection: View {
     }
 }
 
-// Wilks Coefficient Calculation
-func calculateWilks(bodyweight: Double, total: Double, isMale: Bool) -> Double {
-    guard bodyweight > 0, total > 0 else { return 0 }
-    
-    let coefficients: [Double]
-    if isMale {
-        coefficients = [-216.0475144, 16.2606339, -0.002388645, -0.00113732, 7.01863E-06, -1.291E-08]
-    } else {
-        coefficients = [594.31747775582, -27.23842536447, 0.82112226871, -0.00930733913, 4.731582E-05, -9.054E-08]
-    }
-    
-    let bw = bodyweight
-    let denominator = coefficients[0] +
-                     coefficients[1] * bw +
-                     coefficients[2] * pow(bw, 2) +
-                     coefficients[3] * pow(bw, 3) +
-                     coefficients[4] * pow(bw, 4) +
-                     coefficients[5] * pow(bw, 5)
-    
-    return total * 500 / denominator
-}
-
-// MARK: - Header
+// MARK: - Header con Foto Profilo
 struct ProfileHeader: View {
     @ObservedObject var dataManager: DataManager
     
@@ -429,7 +408,7 @@ struct ProfileHeader: View {
     
     var body: some View {
         VStack(spacing: 16) {
-            // Avatar with gradient border
+            // Avatar with Photo or Initials
             ZStack {
                 Circle()
                     .fill(
@@ -445,19 +424,29 @@ struct ProfileHeader: View {
                     .fill(AppColors.background)
                     .frame(width: 120, height: 120)
                 
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppColors.primary.opacity(0.8), AppColors.accent.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                // Mostra foto se presente, altrimenti iniziali
+                if let imageData = dataManager.userProfile.profileImageData,
+                   let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 116, height: 116)
+                        .clipShape(Circle())
+                } else {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [AppColors.primary.opacity(0.8), AppColors.accent.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                         )
-                    )
-                    .frame(width: 116, height: 116)
-                
-                Text(initials)
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundColor(.white)
+                        .frame(width: 116, height: 116)
+                    
+                    Text(initials)
+                        .font(.system(size: 40, weight: .bold))
+                        .foregroundColor(.white)
+                }
             }
             .shadow(color: AppColors.primary.opacity(0.4), radius: 20, x: 0, y: 10)
             
@@ -466,7 +455,7 @@ struct ProfileHeader: View {
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
-            // Livello
+            // Livello (Auto-calcolato)
             HStack(spacing: 8) {
                 Text(dataManager.userProfile.athleteLevel.emoji)
                     .font(.system(size: 14))
@@ -474,6 +463,10 @@ struct ProfileHeader: View {
                 Text(dataManager.userProfile.athleteLevel.displayName)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(AppColors.textPrimary)
+                
+                Text("(Auto)")
+                    .font(.system(size: 11))
+                    .foregroundColor(AppColors.textSecondary)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 8)
@@ -715,7 +708,7 @@ struct ProfileInfoRow: View {
     }
 }
 
-// MARK: - Edit Profile View (Custom Icons)
+// MARK: - Edit Profile View con PhotoPicker
 struct EditProfileView: View {
     @ObservedObject var dataManager: DataManager
     @Binding var isPresented: Bool
@@ -728,7 +721,8 @@ struct EditProfileView: View {
     @State private var squatMax: String
     @State private var benchMax: String
     @State private var deadliftMax: String
-    @State private var athleteLevel: AthleteLevel
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var profileImage: UIImage?
     
     init(dataManager: DataManager, isPresented: Binding<Bool>) {
         self.dataManager = dataManager
@@ -742,7 +736,10 @@ struct EditProfileView: View {
         _squatMax = State(initialValue: String(format: "%.1f", dataManager.userProfile.squatMax))
         _benchMax = State(initialValue: String(format: "%.1f", dataManager.userProfile.benchMax))
         _deadliftMax = State(initialValue: String(format: "%.1f", dataManager.userProfile.deadliftMax))
-        _athleteLevel = State(initialValue: dataManager.userProfile.athleteLevel)
+        
+        if let imageData = dataManager.userProfile.profileImageData {
+            _profileImage = State(initialValue: UIImage(data: imageData))
+        }
     }
     
     var totalMax: Double {
@@ -759,6 +756,52 @@ struct EditProfileView: View {
                 
                 ScrollView {
                     VStack(spacing: 24) {
+                        // Photo Picker
+                        VStack(spacing: 16) {
+                            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                                ZStack {
+                                    if let image = profileImage {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 100, height: 100)
+                                            .clipShape(Circle())
+                                    } else {
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [AppColors.primary.opacity(0.8), AppColors.accent.opacity(0.8)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .frame(width: 100, height: 100)
+                                        
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(.white)
+                                    }
+                                    
+                                    Circle()
+                                        .strokeBorder(AppColors.primary, lineWidth: 3)
+                                        .frame(width: 100, height: 100)
+                                }
+                            }
+                            .onChange(of: selectedPhotoItem) { newItem in
+                                Task {
+                                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                                       let image = UIImage(data: data) {
+                                        profileImage = image
+                                    }
+                                }
+                            }
+                            
+                            Text("Tocca per cambiare foto")
+                                .font(.system(size: 13))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                        .padding(.top, 10)
+                        
                         // Informazioni Personali
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Informazioni Personali")
@@ -775,26 +818,25 @@ struct EditProfileView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Livello Atleta
+                        // Massimali with Custom Icons (no livello picker - auto-calcolato)
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Livello")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(AppColors.textPrimary)
-                            
-                            Picker("Livello", selection: $athleteLevel) {
-                                ForEach([AthleteLevel.beginner, .intermediate, .advanced, .elite], id: \.self) { level in
-                                    Text(level.displayName).tag(level)
-                                }
+                            HStack {
+                                Text("Massimali")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(AppColors.textPrimary)
+                                
+                                Spacer()
+                                
+                                Text("Livello: Auto")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(AppColors.accent)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(AppColors.accent.opacity(0.2))
+                                    )
                             }
-                            .pickerStyle(.segmented)
-                        }
-                        .padding(.horizontal, 20)
-                        
-                        // Massimali with Custom Icons
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Massimali")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(AppColors.textPrimary)
                             
                             VStack(spacing: 16) {
                                 ProfileTextFieldCustomIcon(
@@ -876,7 +918,14 @@ struct EditProfileView: View {
         updatedProfile.squatMax = Double(squatMax) ?? updatedProfile.squatMax
         updatedProfile.benchMax = Double(benchMax) ?? updatedProfile.benchMax
         updatedProfile.deadliftMax = Double(deadliftMax) ?? updatedProfile.deadliftMax
-        updatedProfile.athleteLevel = athleteLevel
+        
+        // Salva foto profilo
+        if let image = profileImage {
+            updatedProfile.profileImageData = image.jpegData(compressionQuality: 0.8)
+        }
+        
+        // Auto-calcola livello atleta
+        updatedProfile.updateAthleteLevel()
         
         dataManager.saveProfile(updatedProfile)
         isPresented = false
