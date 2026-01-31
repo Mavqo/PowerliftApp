@@ -292,6 +292,67 @@ class DataManager: ObservableObject {
         return workouts.filter { $0.exerciseType == exerciseType.rawValue }
     }
     
+    // MARK: - Streak Counter
+    
+    func getCurrentStreak() -> Int {
+        guard !workouts.isEmpty else { return 0 }
+        
+        let calendar = Calendar.current
+        let sortedWorkouts = workouts.sorted { $0.date > $1.date }
+        
+        // Group workouts by day
+        var workoutDays = Set<Date>()
+        for workout in sortedWorkouts {
+            let day = calendar.startOfDay(for: workout.date)
+            workoutDays.insert(day)
+        }
+        
+        let sortedDays = workoutDays.sorted(by: >)
+        guard let mostRecentDay = sortedDays.first else { return 0 }
+        
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        
+        // Check if streak is still active (today or yesterday)
+        if mostRecentDay != today && mostRecentDay != yesterday {
+            return 0
+        }
+        
+        var streak = 0
+        var currentDay = mostRecentDay
+        
+        for day in sortedDays {
+            if day == currentDay {
+                streak += 1
+                currentDay = calendar.date(byAdding: .day, value: -1, to: currentDay)!
+            } else {
+                break
+            }
+        }
+        
+        return streak
+    }
+    
+    func getWeeklyVolumeData() -> [(Int, Double)] {
+        let calendar = Calendar.current
+        let now = Date()
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+        
+        var dailyVolume: [Int: Double] = [:]
+        
+        for i in 0..<7 {
+            dailyVolume[i] = 0
+        }
+        
+        for workout in workouts {
+            if workout.date >= startOfWeek {
+                let dayOfWeek = calendar.component(.weekday, from: workout.date) - 1
+                dailyVolume[dayOfWeek, default: 0] += workout.totalVolume
+            }
+        }
+        
+        return dailyVolume.sorted { $0.key < $1.key }
+    }
     
     // MARK: - Top Set Methods
 
