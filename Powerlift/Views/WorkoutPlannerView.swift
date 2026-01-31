@@ -12,42 +12,72 @@ struct WorkoutPlannerView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppColors.background.ignoresSafeArea()
+                // ⬜ ALABASTER/GREY GRADIENT BACKGROUND
+                LinearGradient(
+                    colors: [
+                        AppColors.alabaster.opacity(0.03),
+                        AppColors.background
+                    ],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+                .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Header
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Gestione Allenamenti")
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(AppColors.textPrimary)
+                        // ⬜ ALABASTER THEME HEADER
+                        VStack(spacing: 16) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 8) {
+                                    Text("Workout Planner")
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundColor(AppColors.textPrimary)
+                                    
+                                    Circle()
+                                        .fill(AppColors.alabaster.opacity(0.6))
+                                        .frame(width: 8, height: 8)
+                                }
+                                
+                                Text("Importa o crea la tua programmazione")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(AppColors.alabaster.opacity(0.6))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 20)
                             
-                            Text("Importa o crea la tua programmazione")
-                                .font(.system(size: 16))
-                                .foregroundColor(AppColors.textSecondary)
+                            // Alabaster accent bar
+                            Rectangle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [AppColors.alabaster.opacity(0.4), AppColors.alabaster.opacity(0.1)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(height: 3)
+                                .padding(.horizontal, 20)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
                         
-                        // Opzione 1: Google Sheets
+                        // Opzione 1: Google Sheets (Cherry accent)
                         WorkoutSourceCard(
                             icon: "doc.text.fill",
                             title: "Import da Google Sheets",
                             description: "Sincronizza con il tuo coach",
-                            color: AppColors.primary,
+                            color: AppColors.cherry,
                             badge: dataManager.sheetsSync.isConnected ? "Connesso" : nil
                         ) {
                             showingGoogleSheetsSetup = true
                         }
                         .padding(.horizontal, 20)
                         
-                        // Opzione 2: Creazione Manuale
+                        // Opzione 2: Creazione Manuale (Alabaster accent)
                         WorkoutSourceCard(
                             icon: "square.and.pencil",
                             title: "Crea Manuale",
                             description: "Programma il tuo workout",
-                            color: AppColors.secondary
+                            color: AppColors.alabaster.opacity(0.8),
+                            badge: nil
                         ) {
                             showingManualCreator = true
                         }
@@ -93,7 +123,13 @@ struct WorkoutSourceCard: View {
                 HStack {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(color.opacity(0.2))
+                            .fill(
+                                LinearGradient(
+                                    colors: [color.opacity(0.3), color.opacity(0.15)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                             .frame(width: 70, height: 70)
                         
                         Image(systemName: icon)
@@ -141,6 +177,17 @@ struct WorkoutSourceCard: View {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(AppColors.cardBackground)
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(
+                        LinearGradient(
+                            colors: [color.opacity(0.3), color.opacity(0.1)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 1.5
+                    )
+            )
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -152,7 +199,7 @@ struct UpcomingWorkoutsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Prossimi Allenamenti")
+            Text("📅 Prossimi Allenamenti")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
             
@@ -171,7 +218,7 @@ struct UpcomingWorkoutRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Date indicator
+            // Date indicator with Alabaster accent
             VStack(spacing: 2) {
                 Text(dayString(workout.date))
                     .font(.system(size: 12, weight: .semibold))
@@ -179,7 +226,7 @@ struct UpcomingWorkoutRow: View {
                 
                 Text(dayNumber(workout.date))
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+                    .foregroundColor(AppColors.alabaster)
                 
                 Text(monthString(workout.date))
                     .font(.system(size: 12))
@@ -189,7 +236,17 @@ struct UpcomingWorkoutRow: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(AppColors.primary.opacity(0.1))
+                    .fill(
+                        LinearGradient(
+                            colors: [AppColors.alabaster.opacity(0.15), AppColors.alabaster.opacity(0.05)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(AppColors.alabaster.opacity(0.2), lineWidth: 1)
             )
             
             // Workout info
@@ -214,7 +271,7 @@ struct UpcomingWorkoutRow: View {
             
             Image(systemName: "chevron.right")
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(AppColors.textSecondary)
+                .foregroundColor(AppColors.alabaster.opacity(0.4))
         }
         .padding()
         .background(
