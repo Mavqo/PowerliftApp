@@ -19,35 +19,27 @@ struct DashboardView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // 🍒 CHERRY GRADIENT BACKGROUND (subtle)
-                LinearGradient(
-                    colors: [
-                        AppColors.cherry.opacity(0.05),
-                        AppColors.background
-                    ],
-                    startPoint: .top,
-                    endPoint: .center
-                )
-                .ignoresSafeArea()
+                // ⬛ BACKGROUND PULITO (no gradient!)
+                AppColors.background.ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        // 🍒 CHERRY THEME HEADER
+                        // 🍒 CHERRY THEME HEADER (solo accent bar)
                         VStack(spacing: 16) {
                             DashboardHeader(dataManager: dataManager)
                                 .padding(.horizontal, 20)
                                 .padding(.top, 10)
                             
-                            // Cherry accent bar
+                            // 🍒 Cherry accent bar (identificativo tab)
                             Rectangle()
                                 .fill(
                                     LinearGradient(
-                                        colors: [AppColors.cherry, AppColors.cherry.opacity(0.3)],
+                                        colors: [AppColors.cherry, AppColors.cherry.opacity(0.5)],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
-                                .frame(height: 3)
+                                .frame(height: 4)
                                 .padding(.horizontal, 20)
                         }
                         .opacity(animateCards ? 1 : 0)
@@ -175,13 +167,7 @@ struct StreakCounterCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: [AppColors.cherry.opacity(0.15), AppColors.cherry.opacity(0.05)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppColors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -297,7 +283,7 @@ struct DashboardHeader: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 6) {
-                // Titolo con Cherry
+                // Titolo con Cherry dot
                 HStack(spacing: 8) {
                     Text("Dashboard")
                         .font(.system(size: 32, weight: .bold))
@@ -310,7 +296,7 @@ struct DashboardHeader: View {
                 
                 Text(greetingMessage())
                     .font(.system(size: 16))
-                    .foregroundColor(AppColors.cherry.opacity(0.8))
+                    .foregroundColor(AppColors.textSecondary)
             }
             
             Spacer()
@@ -434,7 +420,7 @@ struct DashboardStatCard: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(color.opacity(0.15))
+                .fill(AppColors.cardBackground)
         )
     }
 }
@@ -502,13 +488,7 @@ struct DashboardPRCard: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        colors: gradient.map { $0.opacity(0.2) },
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(AppColors.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -518,7 +498,7 @@ struct DashboardPRCard: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 1.5
                 )
         )
     }
