@@ -19,16 +19,39 @@ struct DashboardView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                AppColors.background.ignoresSafeArea()
+                // 🍒 CHERRY GRADIENT BACKGROUND (subtle)
+                LinearGradient(
+                    colors: [
+                        AppColors.cherry.opacity(0.05),
+                        AppColors.background
+                    ],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+                .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        // Header
-                        DashboardHeader(dataManager: dataManager)
-                            .padding(.horizontal, 20)
-                            .padding(.top, 10)
-                            .opacity(animateCards ? 1 : 0)
-                            .offset(y: animateCards ? 0 : -20)
+                        // 🍒 CHERRY THEME HEADER
+                        VStack(spacing: 16) {
+                            DashboardHeader(dataManager: dataManager)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 10)
+                            
+                            // Cherry accent bar
+                            Rectangle()
+                                .fill(
+                                    LinearGradient(
+                                        colors: [AppColors.cherry, AppColors.cherry.opacity(0.3)],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(height: 3)
+                                .padding(.horizontal, 20)
+                        }
+                        .opacity(animateCards ? 1 : 0)
+                        .offset(y: animateCards ? 0 : -20)
                         
                         // 🔥 STREAK COUNTER
                         StreakCounterCard(streak: dataManager.getCurrentStreak())
@@ -89,12 +112,10 @@ struct DashboardView: View {
             }
         }
         .onAppear {
-            // Animazione all'apparizione
             withAnimation(.easeOut(duration: 0.6)) {
                 animateCards = true
             }
             
-            // Auto-sync se connesso a Google Sheets
             Task {
                 await dataManager.autoSync()
             }
@@ -109,12 +130,11 @@ struct StreakCounterCard: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Flame Icon
             ZStack {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: [Color.orange.opacity(0.3), Color.red.opacity(0.3)],
+                            colors: [AppColors.cherry.opacity(0.4), AppColors.cherry.opacity(0.2)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -138,7 +158,7 @@ struct StreakCounterCard: View {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("\(streak)")
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(AppColors.textPrimary)
+                        .foregroundColor(AppColors.cherry)
                     
                     Text(streak == 1 ? "giorno" : "giorni")
                         .font(.system(size: 14))
@@ -157,7 +177,7 @@ struct StreakCounterCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(
                     LinearGradient(
-                        colors: [Color.orange.opacity(0.15), Color.red.opacity(0.1)],
+                        colors: [AppColors.cherry.opacity(0.15), AppColors.cherry.opacity(0.05)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -167,11 +187,11 @@ struct StreakCounterCard: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(
                     LinearGradient(
-                        colors: [Color.orange.opacity(0.5), Color.red.opacity(0.3)],
+                        colors: [AppColors.cherry.opacity(0.5), AppColors.cherry.opacity(0.2)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    lineWidth: 1
+                    lineWidth: 1.5
                 )
         )
         .onAppear {
@@ -213,7 +233,7 @@ struct WeeklyVolumeSparkline: View {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(String(format: "%.0f", totalWeekVolume))
                             .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(AppColors.primary)
+                            .foregroundColor(AppColors.cherry)
                         
                         Text("kg")
                             .font(.system(size: 12))
@@ -224,18 +244,16 @@ struct WeeklyVolumeSparkline: View {
                 Spacer()
             }
             
-            // Mini Bar Chart
             if !data.isEmpty {
                 HStack(alignment: .bottom, spacing: 8) {
                     ForEach(data.sorted(by: { $0.0 < $1.0 }), id: \.0) { day, volume in
                         VStack(spacing: 4) {
-                            // Bar
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(
                                     LinearGradient(
                                         colors: [
-                                            AppColors.primary,
-                                            AppColors.primary.opacity(0.6)
+                                            AppColors.cherry,
+                                            AppColors.cherry.opacity(0.6)
                                         ],
                                         startPoint: .top,
                                         endPoint: .bottom
@@ -243,7 +261,6 @@ struct WeeklyVolumeSparkline: View {
                                 )
                                 .frame(width: 30, height: max(barHeight(volume: volume), 4))
                             
-                            // Day Label
                             Text(dayNames[day])
                                 .font(.system(size: 10))
                                 .foregroundColor(AppColors.textSecondary)
@@ -273,39 +290,60 @@ struct WeeklyVolumeSparkline: View {
     }
 }
 
-// MARK: - Dashboard Header
+// MARK: - 🍒 Dashboard Header (Cherry Theme)
 struct DashboardHeader: View {
     @ObservedObject var dataManager: DataManager
     
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Dashboard")
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+            VStack(alignment: .leading, spacing: 6) {
+                // Titolo con Cherry
+                HStack(spacing: 8) {
+                    Text("Dashboard")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(AppColors.textPrimary)
+                    
+                    Circle()
+                        .fill(AppColors.cherry)
+                        .frame(width: 8, height: 8)
+                }
                 
                 Text(greetingMessage())
                     .font(.system(size: 16))
-                    .foregroundColor(AppColors.textSecondary)
+                    .foregroundColor(AppColors.cherry.opacity(0.8))
             }
             
             Spacer()
             
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [AppColors.primary, AppColors.accent],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            // Avatar con Cherry border
+            ZStack {
+                Circle()
+                    .stroke(
+                        LinearGradient(
+                            colors: [AppColors.cherry, AppColors.cherry.opacity(0.5)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        lineWidth: 3
                     )
-                )
-                .frame(width: 50, height: 50)
-                .overlay(
-                    Text(String(dataManager.userProfile.name.prefix(1)).uppercased())
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.white)
-                )
-                .shadow(color: AppColors.primary.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .frame(width: 56, height: 56)
+                
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [AppColors.cherry, AppColors.cherry.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 50, height: 50)
+                    .overlay(
+                        Text(String(dataManager.userProfile.name.prefix(1)).uppercased())
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.white)
+                    )
+            }
+            .shadow(color: AppColors.cherry.opacity(0.4), radius: 10, x: 0, y: 5)
         }
     }
     
@@ -323,7 +361,7 @@ struct DashboardHeader: View {
     }
 }
 
-// MARK: - Quick Stats
+// MARK: - Quick Stats (Cherry accents)
 struct DashboardQuickStats: View {
     @ObservedObject var dataManager: DataManager
     
@@ -340,7 +378,7 @@ struct DashboardQuickStats: View {
                     title: "Total Volume",
                     value: String(format: "%.0f", dataManager.userProfile.totalLifted),
                     unit: "kg",
-                    color: AppColors.primary
+                    color: AppColors.cherry
                 )
                 
                 DashboardStatCard(
@@ -363,14 +401,13 @@ struct DashboardQuickStats: View {
                     title: "Questa Sett.",
                     value: String(format: "%.0f", dataManager.getWeeklyVolume()),
                     unit: "kg",
-                    color: AppColors.statVelocity
+                    color: AppColors.cherry.opacity(0.8)
                 )
             }
         }
     }
 }
 
-// MARK: - Stat Card
 struct DashboardStatCard: View {
     let title: String
     let value: String
@@ -386,7 +423,7 @@ struct DashboardStatCard: View {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(AppColors.textPrimary)
+                    .foregroundColor(color)
                 
                 Text(unit)
                     .font(.system(size: 12))
@@ -402,7 +439,7 @@ struct DashboardStatCard: View {
     }
 }
 
-// MARK: - Recent PRs with Gradients
+// MARK: - Recent PRs with Cherry Gradients
 struct DashboardRecentPRs: View {
     @ObservedObject var dataManager: DataManager
     
@@ -417,7 +454,7 @@ struct DashboardRecentPRs: View {
                     exercise: "Squat",
                     emoji: "🏋️",
                     weight: dataManager.userProfile.squatMax,
-                    gradient: [AppColors.primary, AppColors.primary.opacity(0.7)]
+                    gradient: [AppColors.cherry, AppColors.cherry.opacity(0.7)]
                 )
                 
                 DashboardPRCard(
@@ -438,7 +475,6 @@ struct DashboardRecentPRs: View {
     }
 }
 
-// MARK: - PR Card with Gradient
 struct DashboardPRCard: View {
     let exercise: String
     let emoji: String
@@ -509,7 +545,7 @@ struct DashboardRecentWorkouts: View {
                     Button(action: {}) {
                         Text("Vedi tutti")
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(AppColors.primary)
+                            .foregroundColor(AppColors.cherry)
                     }
                 }
             }
@@ -527,19 +563,18 @@ struct DashboardRecentWorkouts: View {
     }
 }
 
-// MARK: - Workout Row
 struct DashboardWorkoutRow: View {
     let workout: Workout
     
     var body: some View {
         HStack(spacing: 16) {
             Circle()
-                .fill(AppColors.primary.opacity(0.2))
+                .fill(AppColors.cherry.opacity(0.2))
                 .frame(width: 50, height: 50)
                 .overlay(
                     Image(systemName: "figure.strengthtraining.traditional")
                         .font(.system(size: 22))
-                        .foregroundColor(AppColors.primary)
+                        .foregroundColor(AppColors.cherry)
                 )
             
             VStack(alignment: .leading, spacing: 4) {
@@ -597,7 +632,6 @@ struct DashboardWorkoutRow: View {
     }
 }
 
-// MARK: - Empty State
 struct DashboardEmptyState: View {
     let message: String
     
@@ -616,7 +650,6 @@ struct DashboardEmptyState: View {
     }
 }
 
-// MARK: - Workout Execution View (Placeholder)
 struct WorkoutExecutionView: View {
     let workout: WorkoutPlan
     @ObservedObject var dataManager: DataManager
@@ -657,7 +690,7 @@ struct WorkoutExecutionView: View {
                     Button("Chiudi") {
                         presentationMode.wrappedValue.dismiss()
                     }
-                    .foregroundColor(AppColors.primary)
+                    .foregroundColor(AppColors.cherry)
                 }
             }
         }
