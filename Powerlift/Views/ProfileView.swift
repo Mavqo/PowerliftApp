@@ -31,7 +31,7 @@ struct ProfileView: View {
                     ProfileStatsSection(dataManager: dataManager)
                         .padding(.horizontal, 20)
                     
-                    // Massimali Section
+                    // Massimali Section with Custom Icons
                     ProfileMaxesSection(dataManager: dataManager)
                         .padding(.horizontal, 20)
                     
@@ -181,7 +181,7 @@ struct AchievementBadge: View {
     }
 }
 
-// MARK: - 💪 Progress Rings (Apple Fitness Style)
+// MARK: - 💪 Progress Rings (Apple Fitness Style) - Custom Icons
 struct ProgressRingsSection: View {
     @ObservedObject var dataManager: DataManager
     @Binding var animateRings: Bool
@@ -218,21 +218,24 @@ struct ProgressRingsSection: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 12) {
-                    ProgressRingLegend(
+                    ProgressRingLegendCustom(
+                        icon: AnyView(SquatIcon(color: AppColors.primary, size: 14)),
                         color: AppColors.primary,
                         title: "Squat",
                         current: dataManager.userProfile.squatMax,
                         goal: 200
                     )
                     
-                    ProgressRingLegend(
+                    ProgressRingLegendCustom(
+                        icon: AnyView(BenchPressIcon(color: AppColors.accent, size: 14)),
                         color: AppColors.accent,
                         title: "Bench",
                         current: dataManager.userProfile.benchMax,
                         goal: 150
                     )
                     
-                    ProgressRingLegend(
+                    ProgressRingLegendCustom(
+                        icon: AnyView(DeadliftIcon(color: AppColors.success, size: 14)),
                         color: AppColors.success,
                         title: "Deadlift",
                         current: dataManager.userProfile.deadliftMax,
@@ -281,7 +284,8 @@ struct ProgressRing: View {
     }
 }
 
-struct ProgressRingLegend: View {
+struct ProgressRingLegendCustom: View {
+    let icon: AnyView
     let color: Color
     let title: String
     let current: Double
@@ -293,9 +297,8 @@ struct ProgressRingLegend: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
+            icon
+                .frame(width: 14, height: 14)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -556,7 +559,7 @@ struct ProfileStatCard: View {
     }
 }
 
-// MARK: - Maxes Section
+// MARK: - Maxes Section (Custom Icons)
 struct ProfileMaxesSection: View {
     @ObservedObject var dataManager: DataManager
     
@@ -571,20 +574,23 @@ struct ProfileMaxesSection: View {
                 .foregroundColor(AppColors.textPrimary)
             
             VStack(spacing: 12) {
-                ProfileMaxRow(
-                    exercise: "🏋️ Squat",
+                ProfileMaxRowCustom(
+                    icon: AnyView(SquatIcon(color: AppColors.primary, size: 18)),
+                    exercise: "Squat",
                     max: dataManager.userProfile.squatMax,
                     color: AppColors.primary
                 )
                 
-                ProfileMaxRow(
-                    exercise: "💪 Panca",
+                ProfileMaxRowCustom(
+                    icon: AnyView(BenchPressIcon(color: AppColors.accent, size: 18)),
+                    exercise: "Panca",
                     max: dataManager.userProfile.benchMax,
                     color: AppColors.accent
                 )
                 
-                ProfileMaxRow(
-                    exercise: "🔥 Stacco",
+                ProfileMaxRowCustom(
+                    icon: AnyView(DeadliftIcon(color: AppColors.success, size: 18)),
+                    exercise: "Stacco",
                     max: dataManager.userProfile.deadliftMax,
                     color: AppColors.success
                 )
@@ -626,13 +632,17 @@ struct ProfileMaxesSection: View {
     }
 }
 
-struct ProfileMaxRow: View {
+struct ProfileMaxRowCustom: View {
+    let icon: AnyView
     let exercise: String
     let max: Double
     let color: Color
     
     var body: some View {
         HStack {
+            icon
+                .frame(width: 18, height: 18)
+            
             Text(exercise)
                 .font(.system(size: 16))
                 .foregroundColor(AppColors.textPrimary)
@@ -705,7 +715,7 @@ struct ProfileInfoRow: View {
     }
 }
 
-// MARK: - Edit Profile View
+// MARK: - Edit Profile View (Custom Icons)
 struct EditProfileView: View {
     @ObservedObject var dataManager: DataManager
     @Binding var isPresented: Bool
@@ -780,16 +790,33 @@ struct EditProfileView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Massimali
+                        // Massimali with Custom Icons
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Massimali")
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(AppColors.textPrimary)
                             
                             VStack(spacing: 16) {
-                                ProfileTextField(icon: "🏋️", placeholder: "Squat Max (kg)", text: $squatMax, keyboardType: .decimalPad)
-                                ProfileTextField(icon: "💪", placeholder: "Panca Max (kg)", text: $benchMax, keyboardType: .decimalPad)
-                                ProfileTextField(icon: "🔥", placeholder: "Stacco Max (kg)", text: $deadliftMax, keyboardType: .decimalPad)
+                                ProfileTextFieldCustomIcon(
+                                    icon: AnyView(SquatIcon(color: AppColors.primary, size: 18)),
+                                    placeholder: "Squat Max (kg)",
+                                    text: $squatMax,
+                                    keyboardType: .decimalPad
+                                )
+                                
+                                ProfileTextFieldCustomIcon(
+                                    icon: AnyView(BenchPressIcon(color: AppColors.accent, size: 18)),
+                                    placeholder: "Panca Max (kg)",
+                                    text: $benchMax,
+                                    keyboardType: .decimalPad
+                                )
+                                
+                                ProfileTextFieldCustomIcon(
+                                    icon: AnyView(DeadliftIcon(color: AppColors.success, size: 18)),
+                                    placeholder: "Stacco Max (kg)",
+                                    text: $deadliftMax,
+                                    keyboardType: .decimalPad
+                                )
                             }
                             
                             // Totale Live
@@ -875,6 +902,30 @@ struct ProfileTextField: View {
                     .foregroundColor(AppColors.primary)
                     .frame(width: 24)
             }
+            
+            TextField(placeholder, text: $text)
+                .keyboardType(keyboardType)
+                .foregroundColor(AppColors.textPrimary)
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(AppColors.cardBackground)
+        )
+    }
+}
+
+// MARK: - Profile Text Field with Custom Icon
+struct ProfileTextFieldCustomIcon: View {
+    let icon: AnyView
+    let placeholder: String
+    @Binding var text: String
+    var keyboardType: UIKeyboardType = .default
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            icon
+                .frame(width: 24, height: 24)
             
             TextField(placeholder, text: $text)
                 .keyboardType(keyboardType)
