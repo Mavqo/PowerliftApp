@@ -27,6 +27,7 @@ struct MainView: View {
             CustomTabBar(selectedTab: $selectedTab, dataManager: dataManager)
         }
         .ignoresSafeArea(.keyboard)
+        .preferredColorScheme(.dark) // Forza dark mode su tutta l'app
     }
 }
 
@@ -148,5 +149,6 @@ struct CameraPlaceholderView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
