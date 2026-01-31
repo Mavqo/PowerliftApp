@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import Charts
 
 struct DashboardView: View {
     @ObservedObject var dataManager: DataManager
@@ -8,6 +9,7 @@ struct DashboardView: View {
     @State private var showingWorkoutExecution = false
     @State private var selectedExercise: ExerciseType = .squat
     @State private var todayWorkout: WorkoutPlan?
+    @State private var animateCards = false
     
     init(dataManager: DataManager) {
         self.dataManager = dataManager
@@ -25,6 +27,14 @@ struct DashboardView: View {
                         DashboardHeader(dataManager: dataManager)
                             .padding(.horizontal, 20)
                             .padding(.top, 10)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
+                        
+                        // 🔥 STREAK COUNTER
+                        StreakCounterCard(streak: dataManager.getCurrentStreak())
+                            .padding(.horizontal, 20)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
                         
                         // 🆕 TODAY'S WORKOUT CARD
                         TodayWorkoutCard(
@@ -36,18 +46,32 @@ struct DashboardView: View {
                             }
                         )
                         .padding(.horizontal, 20)
+                        .opacity(animateCards ? 1 : 0)
+                        .offset(y: animateCards ? 0 : -20)
+                        
+                        // 📊 WEEKLY VOLUME CHART
+                        WeeklyVolumeSparkline(data: dataManager.getWeeklyVolumeData())
+                            .padding(.horizontal, 20)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
                         
                         // Quick Stats
                         DashboardQuickStats(dataManager: dataManager)
                             .padding(.horizontal, 20)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
                         
-                        // Recent PRs Section
+                        // Recent PRs Section with Gradients
                         DashboardRecentPRs(dataManager: dataManager)
                             .padding(.horizontal, 20)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
                         
                         // Recent Workouts
                         DashboardRecentWorkouts(dataManager: dataManager)
                             .padding(.horizontal, 20)
+                            .opacity(animateCards ? 1 : 0)
+                            .offset(y: animateCards ? 0 : -20)
                         
                         Spacer(minLength: 100)
                     }
@@ -65,11 +89,187 @@ struct DashboardView: View {
             }
         }
         .onAppear {
+            // Animazione all'apparizione
+            withAnimation(.easeOut(duration: 0.6)) {
+                animateCards = true
+            }
+            
             // Auto-sync se connesso a Google Sheets
             Task {
                 await dataManager.autoSync()
             }
         }
+    }
+}
+
+// MARK: - 🔥 Streak Counter Card
+struct StreakCounterCard: View {
+    let streak: Int
+    @State private var animateFlame = false
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            // Flame Icon
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.orange.opacity(0.3), Color.red.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 60, height: 60)
+                
+                Text("🔥")
+                    .font(.system(size: 35))
+                    .scaleEffect(animateFlame ? 1.1 : 1.0)
+                    .animation(
+                        Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true),
+                        value: animateFlame
+                    )
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Current Streak")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppColors.textSecondary)
+                
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("\(streak)")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(AppColors.textPrimary)
+                    
+                    Text(streak == 1 ? "giorno" : "giorni")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppColors.textSecondary)
+                }
+                
+                Text(streakMessage)
+                    .font(.system(size: 12))
+                    .foregroundColor(AppColors.accent)
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        colors: [Color.orange.opacity(0.15), Color.red.opacity(0.1)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.orange.opacity(0.5), Color.red.opacity(0.3)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .onAppear {
+            animateFlame = true
+        }
+    }
+    
+    private var streakMessage: String {
+        if streak == 0 {
+            return "Inizia oggi! 💪"
+        } else if streak < 7 {
+            return "Continua così!"
+        } else if streak < 30 {
+            return "Ottimo lavoro! 🎯"
+        } else {
+            return "Sei un campione! 🏆"
+        }
+    }
+}
+
+// MARK: - 📊 Weekly Volume Sparkline
+struct WeeklyVolumeSparkline: View {
+    let data: [(Int, Double)]
+    
+    private let dayNames = ["L", "M", "M", "G", "V", "S", "D"]
+    
+    var totalWeekVolume: Double {
+        data.reduce(0) { $0 + $1.1 }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Volume Settimanale")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(AppColors.textPrimary)
+                    
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(String(format: "%.0f", totalWeekVolume))
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundColor(AppColors.primary)
+                        
+                        Text("kg")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppColors.textSecondary)
+                    }
+                }
+                
+                Spacer()
+            }
+            
+            // Mini Bar Chart
+            if !data.isEmpty {
+                HStack(alignment: .bottom, spacing: 8) {
+                    ForEach(data.sorted(by: { $0.0 < $1.0 }), id: \.0) { day, volume in
+                        VStack(spacing: 4) {
+                            // Bar
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [
+                                            AppColors.primary,
+                                            AppColors.primary.opacity(0.6)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .frame(width: 30, height: max(barHeight(volume: volume), 4))
+                            
+                            // Day Label
+                            Text(dayNames[day])
+                                .font(.system(size: 10))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                    }
+                }
+                .frame(height: 80)
+            } else {
+                Text("Nessun dato questa settimana")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppColors.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 20)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(AppColors.cardBackground)
+        )
+    }
+    
+    private func barHeight(volume: Double) -> CGFloat {
+        let maxVolume = data.map { $0.1 }.max() ?? 1
+        let ratio = maxVolume > 0 ? volume / maxVolume : 0
+        return CGFloat(ratio) * 70
     }
 }
 
@@ -92,13 +292,20 @@ struct DashboardHeader: View {
             Spacer()
             
             Circle()
-                .fill(AppColors.primary.opacity(0.2))
+                .fill(
+                    LinearGradient(
+                        colors: [AppColors.primary, AppColors.accent],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .frame(width: 50, height: 50)
                 .overlay(
                     Text(String(dataManager.userProfile.name.prefix(1)).uppercased())
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(AppColors.primary)
+                        .foregroundColor(.white)
                 )
+                .shadow(color: AppColors.primary.opacity(0.3), radius: 8, x: 0, y: 4)
         }
     }
     
@@ -195,7 +402,7 @@ struct DashboardStatCard: View {
     }
 }
 
-// MARK: - Recent PRs
+// MARK: - Recent PRs with Gradients
 struct DashboardRecentPRs: View {
     @ObservedObject var dataManager: DataManager
     
@@ -208,51 +415,75 @@ struct DashboardRecentPRs: View {
             HStack(spacing: 12) {
                 DashboardPRCard(
                     exercise: "Squat",
+                    emoji: "🏋️",
                     weight: dataManager.userProfile.squatMax,
-                    color: AppColors.primary
+                    gradient: [AppColors.primary, AppColors.primary.opacity(0.7)]
                 )
                 
                 DashboardPRCard(
                     exercise: "Bench",
+                    emoji: "💪",
                     weight: dataManager.userProfile.benchMax,
-                    color: AppColors.secondary
+                    gradient: [AppColors.accent, AppColors.accent.opacity(0.7)]
                 )
                 
                 DashboardPRCard(
                     exercise: "Deadlift",
+                    emoji: "🔥",
                     weight: dataManager.userProfile.deadliftMax,
-                    color: AppColors.accent
+                    gradient: [AppColors.success, AppColors.success.opacity(0.7)]
                 )
             }
         }
     }
 }
 
-// MARK: - PR Card
+// MARK: - PR Card with Gradient
 struct DashboardPRCard: View {
     let exercise: String
+    let emoji: String
     let weight: Double
-    let color: Color
+    let gradient: [Color]
     
     var body: some View {
-        VStack(spacing: 8) {
-            Text(exercise)
-                .font(.system(size: 12))
-                .foregroundColor(AppColors.textSecondary)
+        VStack(spacing: 12) {
+            Text(emoji)
+                .font(.system(size: 32))
             
             Text(String(format: "%.1f", weight))
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(AppColors.textPrimary)
+            
+            Text(exercise)
+                .font(.system(size: 11))
+                .foregroundColor(AppColors.textSecondary)
             
             Text("kg")
                 .font(.system(size: 10))
                 .foregroundColor(AppColors.textSecondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .padding(.vertical, 16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(color.opacity(0.15))
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        colors: gradient.map { $0.opacity(0.2) },
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(
+                    LinearGradient(
+                        colors: gradient.map { $0.opacity(0.4) },
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1
+                )
         )
     }
 }
