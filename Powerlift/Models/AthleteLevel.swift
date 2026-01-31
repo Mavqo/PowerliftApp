@@ -1,9 +1,9 @@
 import Foundation
 
 enum AthleteLevel: String, Codable, CaseIterable {
-    case beginner = "Principiante"
-    case intermediate = "Intermedio"
-    case advanced = "Avanzato"
+    case beginner = "Beginner"
+    case intermediate = "Intermediate"
+    case advanced = "Advanced"
     case elite = "Elite"
     
     var displayName: String {
@@ -23,16 +23,17 @@ enum AthleteLevel: String, Codable, CaseIterable {
         }
     }
     
+    // Official IPF GL Points ranges
     var description: String {
         switch self {
         case .beginner:
-            return "0-2 anni di allenamento"
+            return "IPF GL: 70-79 Points"
         case .intermediate:
-            return "2-5 anni di allenamento"
+            return "IPF GL: 80-89 Points"
         case .advanced:
-            return "5+ anni di allenamento"
+            return "IPF GL: 90-99 Points"
         case .elite:
-            return "Atleta competitivo"
+            return "IPF GL: 100+ Points"
         }
     }
     
