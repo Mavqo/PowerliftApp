@@ -12,20 +12,12 @@ struct WorkoutPlannerView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // ⬜ ALABASTER/GREY GRADIENT BACKGROUND
-                LinearGradient(
-                    colors: [
-                        AppColors.alabaster.opacity(0.03),
-                        AppColors.background
-                    ],
-                    startPoint: .top,
-                    endPoint: .center
-                )
-                .ignoresSafeArea()
+                // ⬛ BACKGROUND PULITO (no gradient!)
+                AppColors.background.ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // ⬜ ALABASTER THEME HEADER
+                        // ⬜ ALABASTER THEME HEADER (solo accent bar)
                         VStack(spacing: 16) {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 8) {
@@ -40,22 +32,22 @@ struct WorkoutPlannerView: View {
                                 
                                 Text("Importa o crea la tua programmazione")
                                     .font(.system(size: 16))
-                                    .foregroundColor(AppColors.alabaster.opacity(0.6))
+                                    .foregroundColor(AppColors.textSecondary)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.top, 20)
                             
-                            // Alabaster accent bar
+                            // ⬜ Alabaster accent bar (identificativo tab)
                             Rectangle()
                                 .fill(
                                     LinearGradient(
-                                        colors: [AppColors.alabaster.opacity(0.4), AppColors.alabaster.opacity(0.1)],
+                                        colors: [AppColors.alabaster.opacity(0.5), AppColors.alabaster.opacity(0.2)],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
                                 )
-                                .frame(height: 3)
+                                .frame(height: 4)
                                 .padding(.horizontal, 20)
                         }
                         
@@ -123,12 +115,17 @@ struct WorkoutSourceCard: View {
                 HStack {
                     ZStack {
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [color.opacity(0.3), color.opacity(0.15)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
+                            .fill(AppColors.cardBackground)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(
+                                        LinearGradient(
+                                            colors: [color.opacity(0.4), color.opacity(0.2)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
                             )
                             .frame(width: 70, height: 70)
                         
@@ -176,17 +173,6 @@ struct WorkoutSourceCard: View {
             .background(
                 RoundedRectangle(cornerRadius: 20)
                     .fill(AppColors.cardBackground)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(
-                        LinearGradient(
-                            colors: [color.opacity(0.3), color.opacity(0.1)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1.5
-                    )
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -236,17 +222,11 @@ struct UpcomingWorkoutRow: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            colors: [AppColors.alabaster.opacity(0.15), AppColors.alabaster.opacity(0.05)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(AppColors.cardBackground)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(AppColors.alabaster.opacity(0.2), lineWidth: 1)
+                    .stroke(AppColors.alabaster.opacity(0.3), lineWidth: 1.5)
             )
             
             // Workout info
