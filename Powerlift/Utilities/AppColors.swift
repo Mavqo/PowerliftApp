@@ -7,13 +7,16 @@ struct AppColors {
     // ============================================
     
     /// 0F0F0F - Onyx ⬛ [Background]
-    static let onyx = Color(hex: "0F0F0F")
+    /// RGB: (15, 15, 15)
+    static let onyx = Color(red: 15/255, green: 15/255, blue: 15/255)
     
     /// C41E3A - Intense Cherry 🍒 [Primary/Accent]
-    static let cherry = Color(hex: "C41E3A")
+    /// RGB: (196, 30, 58)
+    static let cherry = Color(red: 196/255, green: 30/255, blue: 58/255)
     
     /// EAEAEA - Alabaster Grey ⬜ [Text]
-    static let alabaster = Color(hex: "EAEAEA")
+    /// RGB: (234, 234, 234)
+    static let alabaster = Color(red: 234/255, green: 234/255, blue: 234/255)
     
     // ============================================
     // COLORI SEMANTICI 🎯
@@ -25,14 +28,14 @@ struct AppColors {
     
     /// SECONDARIO - Cherry più scuro
     /// Usa per: Elementi secondari, supporto, varianti
-    static let secondary = Color(hex: "A01830")  // Cherry scuro
+    static let secondary = Color(red: 160/255, green: 24/255, blue: 48/255)  // Cherry scuro
     
-    /// ACCENT - Cherry più chiaro
+    /// ACCENT - Cherry più chiaro  
     /// Usa per: Accenti leggeri, highlights, dettagli
-    static let accent = Color(hex: "E63956")  // Cherry chiaro
+    static let accent = Color(red: 230/255, green: 57/255, blue: 86/255)  // Cherry chiaro
     
-    /// SUCCESS - Verde derivato da Cherry
-    static let success = Color(hex: "4CAF50")  // Verde per completamenti
+    /// SUCCESS - Verde per completamenti
+    static let success = Color(red: 76/255, green: 175/255, blue: 80/255)
     
     // ============================================
     // BACKGROUND 🖼️
@@ -42,10 +45,10 @@ struct AppColors {
     static let background = onyx  // #0F0F0F ⬛
     
     /// Background cards/elementi elevati (Onyx + 5%)
-    static let cardBackground = Color(hex: "1A1A1A")  // Onyx più chiaro
+    static let cardBackground = Color(red: 26/255, green: 26/255, blue: 26/255)  // #1A1A1A
     
     /// Background ancora più elevato (Onyx + 10%)
-    static let backgroundElevated = Color(hex: "252525")  // Onyx ancora più chiaro
+    static let backgroundElevated = Color(red: 37/255, green: 37/255, blue: 37/255)  // #252525
     
     /// Background modali (Onyx base)
     static let backgroundModal = onyx
@@ -57,11 +60,11 @@ struct AppColors {
     /// Testo principale - Alabaster Grey ⬜
     static let textPrimary = alabaster  // #EAEAEA
     
-    /// Testo secondario (Alabaster più scuro)
-    static let textSecondary = Color(hex: "999999")  // Grigio medio
+    /// Testo secondario (grigio medio)
+    static let textSecondary = Color(red: 153/255, green: 153/255, blue: 153/255)  // #999999
     
-    /// Testo terziario (Alabaster ancora più scuro)
-    static let textTertiary = Color(hex: "666666")  // Grigio scuro
+    /// Testo terziario (grigio scuro)
+    static let textTertiary = Color(red: 102/255, green: 102/255, blue: 102/255)  // #666666
     
     // ============================================
     // STATUS COLORS 🚦
@@ -71,7 +74,7 @@ struct AppColors {
     static let error = cherry  // 🍒 Cherry
     
     /// Warning, attenzione ⚠️
-    static let warning = Color(hex: "FF9800")  // Arancione
+    static let warning = Color(red: 255/255, green: 152/255, blue: 0/255)  // Arancione
     
     // ============================================
     // STATS COLORS 📊
@@ -104,31 +107,4 @@ struct AppColors {
     
     /// Bordi inattivi
     static let borderInactive = Color.white.opacity(0.1)
-}
-
-// MARK: - Color Extension per HEX
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
 }
