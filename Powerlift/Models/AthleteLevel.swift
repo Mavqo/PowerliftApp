@@ -10,6 +10,19 @@ enum AthleteLevel: String, Codable, CaseIterable {
         return self.rawValue
     }
     
+    var emoji: String {
+        switch self {
+        case .beginner:
+            return "🌱"
+        case .intermediate:
+            return "💪"
+        case .advanced:
+            return "🔥"
+        case .elite:
+            return "👑"
+        }
+    }
+    
     var description: String {
         switch self {
         case .beginner:
