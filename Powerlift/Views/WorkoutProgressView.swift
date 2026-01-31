@@ -26,7 +26,7 @@ struct WorkoutProgressView: View {
                         .opacity(animateCharts ? 1 : 0)
                         .offset(y: animateCharts ? 0 : -20)
                     
-                    // Exercise Selector
+                    // Exercise Selector with Custom Icons
                     ExerciseSelector(selectedExercise: $selectedExercise)
                         .padding(.horizontal, 20)
                         .opacity(animateCharts ? 1 : 0)
@@ -63,7 +63,7 @@ struct WorkoutProgressView: View {
                         .opacity(animateCharts ? 1 : 0)
                         .offset(y: animateCharts ? 0 : -20)
                     
-                    // PRs Summary
+                    // PRs Summary with Custom Icons
                     PRsSummarySection(dataManager: dataManager)
                         .padding(.horizontal, 20)
                         .opacity(animateCharts ? 1 : 0)
@@ -187,7 +187,7 @@ struct MilestoneBadge: View {
     }
 }
 
-// MARK: - 🎯 Exercise Selector
+// MARK: - 🎯 Exercise Selector (Custom Icons)
 struct ExerciseSelector: View {
     @Binding var selectedExercise: ExerciseType
     
@@ -200,7 +200,10 @@ struct ExerciseSelector: View {
                     }
                 }) {
                     HStack(spacing: 8) {
-                        Text(exercise.emoji)
+                        // Custom Icons invece di emoji
+                        exerciseIcon(exercise)
+                            .frame(width: 20, height: 20)
+                        
                         Text(exercise.displayName)
                             .font(.system(size: 14, weight: selectedExercise == exercise ? .semibold : .regular))
                     }
@@ -209,10 +212,30 @@ struct ExerciseSelector: View {
                     .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(selectedExercise == exercise ? AppColors.primary : AppColors.cardBackground)
+                            .fill(selectedExercise == exercise ? exerciseColor(exercise) : AppColors.cardBackground)
                     )
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func exerciseIcon(_ exercise: ExerciseType) -> some View {
+        switch exercise {
+        case .squat:
+            SquatIcon(color: selectedExercise == exercise ? .white : AppColors.primary, size: 16)
+        case .bench:
+            BenchPressIcon(color: selectedExercise == exercise ? .white : AppColors.accent, size: 16)
+        case .deadlift:
+            DeadliftIcon(color: selectedExercise == exercise ? .white : AppColors.success, size: 16)
+        }
+    }
+    
+    private func exerciseColor(_ exercise: ExerciseType) -> Color {
+        switch exercise {
+        case .squat: return AppColors.primary
+        case .bench: return AppColors.accent
+        case .deadlift: return AppColors.success
         }
     }
 }
@@ -505,7 +528,7 @@ struct WorkoutHeatmapSection: View {
     }
 }
 
-// MARK: - 💪 PRs Summary
+// MARK: - 💪 PRs Summary (Custom Icons)
 struct PRsSummarySection: View {
     @ObservedObject var dataManager: DataManager
     
@@ -520,26 +543,26 @@ struct PRsSummarySection: View {
                 .foregroundColor(AppColors.textPrimary)
             
             HStack(spacing: 12) {
-                PRCard(
+                PRCardCustom(
                     title: "Squat",
                     weight: dataManager.userProfile.squatMax,
-                    emoji: "🏋️",
+                    icon: AnyView(SquatIcon(color: AppColors.primary, size: 28)),
                     color: AppColors.primary
                 )
                 
-                PRCard(
+                PRCardCustom(
                     title: "Panca",
                     weight: dataManager.userProfile.benchMax,
-                    emoji: "💪",
+                    icon: AnyView(BenchPressIcon(color: AppColors.accent, size: 28)),
                     color: AppColors.accent
                 )
             }
             
             HStack(spacing: 12) {
-                PRCard(
+                PRCardCustom(
                     title: "Stacco",
                     weight: dataManager.userProfile.deadliftMax,
-                    emoji: "🔥",
+                    icon: AnyView(DeadliftIcon(color: AppColors.success, size: 28)),
                     color: AppColors.success
                 )
                 
@@ -581,17 +604,17 @@ struct PRsSummarySection: View {
     }
 }
 
-// MARK: - PR Card
-struct PRCard: View {
+// MARK: - PR Card (Custom Icon)
+struct PRCardCustom: View {
     let title: String
     let weight: Double
-    let emoji: String
+    let icon: AnyView
     let color: Color
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(emoji)
-                .font(.system(size: 32))
+            icon
+                .frame(width: 32, height: 32)
             
             Text(String(format: "%.1f kg", weight))
                 .font(.system(size: 20, weight: .bold))
