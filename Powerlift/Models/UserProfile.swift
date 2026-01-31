@@ -47,7 +47,7 @@ struct UserProfile: Codable {
         self.equipmentType = equipmentType
     }
     
-    // MARK: - Auto-calculate Athlete Level based on IPF GL Points
+    // MARK: - Auto-calculate Athlete Level based on IPF GL Points (Official IPF System)
     mutating func updateAthleteLevel() {
         let ipfGL = calculateIPFGLPoints(
             bodyweight: bodyweight,
@@ -56,15 +56,18 @@ struct UserProfile: Codable {
             equipmentType: equipmentType
         )
         
-        // IPF GL Points classification
-        if ipfGL < 300 {
-            athleteLevel = .beginner
-        } else if ipfGL < 450 {
-            athleteLevel = .intermediate
-        } else if ipfGL < 550 {
-            athleteLevel = .advanced
+        // Official IPF GL Points Classification System
+        // Based on IPF documentation where 100 = Elite level
+        if ipfGL < 70 {
+            athleteLevel = .beginner  // Untrained/Beginner
+        } else if ipfGL < 80 {
+            athleteLevel = .beginner  // Beginner (70-79)
+        } else if ipfGL < 90 {
+            athleteLevel = .intermediate  // Intermediate (80-89)
+        } else if ipfGL < 100 {
+            athleteLevel = .advanced  // Advanced (90-99)
         } else {
-            athleteLevel = .elite
+            athleteLevel = .elite  // Elite (100+)
         }
     }
     
