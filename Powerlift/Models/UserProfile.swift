@@ -14,6 +14,8 @@ struct UserProfile: Codable {
     var totalLifted: Double
     var hasCompletedOnboarding: Bool
     var profileImageData: Data?
+    var gender: Gender = .male
+    var equipmentType: EquipmentType = .classic
     
     init(name: String = "Atleta",
          email: String = "",
@@ -26,7 +28,9 @@ struct UserProfile: Codable {
          deadliftMax: Double = 120.0,
          totalLifted: Double = 0.0,
          hasCompletedOnboarding: Bool = false,
-         profileImageData: Data? = nil) {
+         profileImageData: Data? = nil,
+         gender: Gender = .male,
+         equipmentType: EquipmentType = .classic) {
         self.name = name
         self.email = email
         self.bodyweight = bodyweight
@@ -39,22 +43,25 @@ struct UserProfile: Codable {
         self.totalLifted = totalLifted
         self.hasCompletedOnboarding = hasCompletedOnboarding
         self.profileImageData = profileImageData
+        self.gender = gender
+        self.equipmentType = equipmentType
     }
     
-    // MARK: - Auto-calculate Athlete Level based on IPF Points
+    // MARK: - Auto-calculate Athlete Level based on IPF GL Points
     mutating func updateAthleteLevel() {
-        let ipfPoints = calculateIPFPoints(
+        let ipfGL = calculateIPFGLPoints(
             bodyweight: bodyweight,
             total: squatMax + benchMax + deadliftMax,
-            isMale: true
+            gender: gender,
+            equipmentType: equipmentType
         )
         
-        // IPF Points classification
-        if ipfPoints < 300 {
+        // IPF GL Points classification
+        if ipfGL < 300 {
             athleteLevel = .beginner
-        } else if ipfPoints < 450 {
+        } else if ipfGL < 450 {
             athleteLevel = .intermediate
-        } else if ipfPoints < 550 {
+        } else if ipfGL < 550 {
             athleteLevel = .advanced
         } else {
             athleteLevel = .elite
@@ -73,27 +80,39 @@ struct UserProfile: Codable {
     }
 }
 
-// MARK: - IPF Points Calculation (GL Points Formula)
-func calculateIPFPoints(bodyweight: Double, total: Double, isMale: Bool) -> Double {
+// MARK: - Gender Enum
+enum Gender: String, Codable {
+    case male = "Male"
+    case female = "Female"
+}
+
+// MARK: - Equipment Type Enum
+enum EquipmentType: String, Codable {
+    case classic = "Classic"
+    case equipped = "Equipped"
+}
+
+// MARK: - IPF GL Points Calculation (Official Formula 2020-2023)
+func calculateIPFGLPoints(bodyweight: Double, total: Double, gender: Gender, equipmentType: EquipmentType) -> Double {
     guard bodyweight > 0, total > 0 else { return 0 }
     
-    let bw = bodyweight
-    let coefficients: [Double]
+    // IPF GL Coefficient Constants (2020-2023)
+    let constants: (a: Double, b: Double, c: Double)
     
-    if isMale {
-        // Men's coefficients (IPF GL Points)
-        coefficients = [1199.72839, 1025.18162, 0.00921]
-    } else {
-        // Women's coefficients (IPF GL Points)
-        coefficients = [610.32796, 1045.59282, 0.03048]
+    switch (gender, equipmentType) {
+    case (.male, .classic):
+        constants = (a: 1199.72839, b: 1025.18162, c: 0.00921)
+    case (.male, .equipped):
+        constants = (a: 1236.25115, b: 1449.21864, c: 0.01644)
+    case (.female, .classic):
+        constants = (a: 610.32796, b: 1045.59282, c: 0.03048)
+    case (.female, .equipped):
+        constants = (a: 758.63878, b: 949.31382, c: 0.02435)
     }
     
-    let a = coefficients[0]
-    let b = coefficients[1]
-    let c = coefficients[2]
+    // Formula: IPF GL = (100 × Total) / (A - B × e^(-C × BWT))
+    let denominator = constants.a - constants.b * exp(-constants.c * bodyweight)
+    let ipfGL = (100.0 * total) / denominator
     
-    let denominator = a - b * exp(-c * bw)
-    let ipfPoints = 500 + 100 * (total - denominator) / denominator
-    
-    return max(0, ipfPoints)
+    return max(0, ipfGL)
 }
