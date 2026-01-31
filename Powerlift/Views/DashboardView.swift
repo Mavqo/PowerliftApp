@@ -19,8 +19,9 @@ struct DashboardView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // ⬛ BACKGROUND PULITO (no gradient!)
-                AppColors.background.ignoresSafeArea()
+                // ⬛ BACKGROUND PULITO
+                AppColors.background
+                    .ignoresSafeArea() // Estende fino alla status bar
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
@@ -76,7 +77,7 @@ struct DashboardView: View {
                             .opacity(animateCards ? 1 : 0)
                             .offset(y: animateCards ? 0 : -20)
                         
-                        // Recent PRs Section with Gradients
+                        // Recent PRs Section with SF Symbols
                         DashboardRecentPRs(dataManager: dataManager)
                             .padding(.horizontal, 20)
                             .opacity(animateCards ? 1 : 0)
@@ -94,6 +95,7 @@ struct DashboardView: View {
                 }
             }
             .navigationBarHidden(true)
+            .preferredColorScheme(.dark) // Forza dark mode per status bar
             .sheet(isPresented: $showingWorkoutExecution) {
                 if let workout = todayWorkout {
                     WorkoutExecutionView(
@@ -425,7 +427,7 @@ struct DashboardStatCard: View {
     }
 }
 
-// MARK: - Recent PRs with Cherry Gradients
+// MARK: - Recent PRs with SF Symbols Icons
 struct DashboardRecentPRs: View {
     @ObservedObject var dataManager: DataManager
     
@@ -436,23 +438,26 @@ struct DashboardRecentPRs: View {
                 .foregroundColor(AppColors.textPrimary)
             
             HStack(spacing: 12) {
+                // SQUAT - icona squat
                 DashboardPRCard(
                     exercise: "Squat",
-                    emoji: "🏋️",
+                    icon: "figure.squat",
                     weight: dataManager.userProfile.squatMax,
                     gradient: [AppColors.cherry, AppColors.cherry.opacity(0.7)]
                 )
                 
+                // BENCH - icona bench press
                 DashboardPRCard(
                     exercise: "Bench",
-                    emoji: "💪",
+                    icon: "figure.strengthtraining.traditional",
                     weight: dataManager.userProfile.benchMax,
                     gradient: [AppColors.accent, AppColors.accent.opacity(0.7)]
                 )
                 
+                // DEADLIFT - icona deadlift
                 DashboardPRCard(
                     exercise: "Deadlift",
-                    emoji: "🔥",
+                    icon: "figure.strengthtraining.functional",
                     weight: dataManager.userProfile.deadliftMax,
                     gradient: [AppColors.success, AppColors.success.opacity(0.7)]
                 )
@@ -463,14 +468,16 @@ struct DashboardRecentPRs: View {
 
 struct DashboardPRCard: View {
     let exercise: String
-    let emoji: String
+    let icon: String // SF Symbol invece di emoji
     let weight: Double
     let gradient: [Color]
     
     var body: some View {
         VStack(spacing: 12) {
-            Text(emoji)
-                .font(.system(size: 32))
+            // Icona SF Symbol
+            Image(systemName: icon)
+                .font(.system(size: 32, weight: .semibold))
+                .foregroundColor(gradient[0])
             
             Text(String(format: "%.1f", weight))
                 .font(.system(size: 20, weight: .bold))
@@ -674,5 +681,6 @@ struct WorkoutExecutionView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
