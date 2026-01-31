@@ -21,17 +21,17 @@ struct DashboardView: View {
             ZStack {
                 // ⬛ BACKGROUND PULITO
                 AppColors.background
-                    .ignoresSafeArea() // Estende fino alla status bar
+                    .ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
-                        // 🍒 CHERRY THEME HEADER (solo accent bar)
+                        // 🍒 CHERRY THEME HEADER
                         VStack(spacing: 16) {
                             DashboardHeader(dataManager: dataManager)
                                 .padding(.horizontal, 20)
                                 .padding(.top, 10)
                             
-                            // 🍒 Cherry accent bar (identificativo tab)
+                            // 🍒 Cherry accent bar
                             Rectangle()
                                 .fill(
                                     LinearGradient(
@@ -77,7 +77,7 @@ struct DashboardView: View {
                             .opacity(animateCards ? 1 : 0)
                             .offset(y: animateCards ? 0 : -20)
                         
-                        // Recent PRs Section with SF Symbols
+                        // Recent PRs with Custom Icons
                         DashboardRecentPRs(dataManager: dataManager)
                             .padding(.horizontal, 20)
                             .opacity(animateCards ? 1 : 0)
@@ -95,7 +95,7 @@ struct DashboardView: View {
                 }
             }
             .navigationBarHidden(true)
-            .preferredColorScheme(.dark) // Forza dark mode per status bar
+            .preferredColorScheme(.dark)
             .sheet(isPresented: $showingWorkoutExecution) {
                 if let workout = todayWorkout {
                     WorkoutExecutionView(
@@ -278,14 +278,13 @@ struct WeeklyVolumeSparkline: View {
     }
 }
 
-// MARK: - 🍒 Dashboard Header (Cherry Theme)
+// MARK: - 🍒 Dashboard Header
 struct DashboardHeader: View {
     @ObservedObject var dataManager: DataManager
     
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 6) {
-                // Titolo con Cherry dot
                 HStack(spacing: 8) {
                     Text("Dashboard")
                         .font(.system(size: 32, weight: .bold))
@@ -303,7 +302,6 @@ struct DashboardHeader: View {
             
             Spacer()
             
-            // Avatar con Cherry border
             ZStack {
                 Circle()
                     .stroke(
@@ -349,7 +347,7 @@ struct DashboardHeader: View {
     }
 }
 
-// MARK: - Quick Stats (Cherry accents)
+// MARK: - Quick Stats
 struct DashboardQuickStats: View {
     @ObservedObject var dataManager: DataManager
     
@@ -427,7 +425,7 @@ struct DashboardStatCard: View {
     }
 }
 
-// MARK: - Recent PRs with SF Symbols Icons
+// MARK: - Recent PRs with CUSTOM ICONS 🏋️
 struct DashboardRecentPRs: View {
     @ObservedObject var dataManager: DataManager
     
@@ -438,26 +436,26 @@ struct DashboardRecentPRs: View {
                 .foregroundColor(AppColors.textPrimary)
             
             HStack(spacing: 12) {
-                // SQUAT - icona squat
-                DashboardPRCard(
+                // SQUAT - Custom Icon
+                DashboardPRCardCustom(
                     exercise: "Squat",
-                    icon: "figure.squat",
+                    iconView: AnyView(SquatIcon(color: AppColors.cherry, size: 32)),
                     weight: dataManager.userProfile.squatMax,
                     gradient: [AppColors.cherry, AppColors.cherry.opacity(0.7)]
                 )
                 
-                // BENCH - icona bench press
-                DashboardPRCard(
+                // BENCH PRESS - Custom Icon
+                DashboardPRCardCustom(
                     exercise: "Bench",
-                    icon: "figure.strengthtraining.traditional",
+                    iconView: AnyView(BenchPressIcon(color: AppColors.accent, size: 32)),
                     weight: dataManager.userProfile.benchMax,
                     gradient: [AppColors.accent, AppColors.accent.opacity(0.7)]
                 )
                 
-                // DEADLIFT - icona deadlift
-                DashboardPRCard(
+                // DEADLIFT - Custom Icon
+                DashboardPRCardCustom(
                     exercise: "Deadlift",
-                    icon: "figure.strengthtraining.functional",
+                    iconView: AnyView(DeadliftIcon(color: AppColors.success, size: 32)),
                     weight: dataManager.userProfile.deadliftMax,
                     gradient: [AppColors.success, AppColors.success.opacity(0.7)]
                 )
@@ -466,18 +464,17 @@ struct DashboardRecentPRs: View {
     }
 }
 
-struct DashboardPRCard: View {
+struct DashboardPRCardCustom: View {
     let exercise: String
-    let icon: String // SF Symbol invece di emoji
+    let iconView: AnyView
     let weight: Double
     let gradient: [Color]
     
     var body: some View {
         VStack(spacing: 12) {
-            // Icona SF Symbol
-            Image(systemName: icon)
-                .font(.system(size: 32, weight: .semibold))
-                .foregroundColor(gradient[0])
+            // Icona Custom
+            iconView
+                .frame(width: 40, height: 40)
             
             Text(String(format: "%.1f", weight))
                 .font(.system(size: 20, weight: .bold))
