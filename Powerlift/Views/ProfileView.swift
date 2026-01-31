@@ -314,7 +314,7 @@ struct ProgressRingLegendCustom: View {
     }
 }
 
-// MARK: - 📊 IPF GL Points (Formula Corretta)
+// MARK: - 📊 IPF GL Points (Sistema IPF Ufficiale)
 struct IPFGLPointsSection: View {
     @ObservedObject var dataManager: DataManager
     
@@ -327,13 +327,16 @@ struct IPFGLPointsSection: View {
         )
     }
     
+    // Official IPF GL Points Rating System (100 = Elite)
     var ipfRating: (String, Color) {
         switch ipfGL {
-        case 0..<300: return ("Principiante", .gray)
-        case 300..<450: return ("Intermedio", .blue)
-        case 450..<550: return ("Avanzato", .purple)
-        case 550..<650: return ("Elite", .orange)
-        default: return ("World Class", .red)
+        case 0..<70: return ("Untrained", .gray)
+        case 70..<80: return ("Beginner", .blue)
+        case 80..<90: return ("Intermediate", .purple)
+        case 90..<100: return ("Advanced", .orange)
+        case 100..<110: return ("Elite", .red)
+        case 110..<120: return ("Master", Color(red: 0.8, green: 0.2, blue: 0.8))
+        default: return ("World Class", Color(red: 1.0, green: 0.84, blue: 0.0))
         }
     }
     
@@ -345,7 +348,7 @@ struct IPFGLPointsSection: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(AppColors.textPrimary)
                     
-                    Text("Coefficiente IPF \(dataManager.userProfile.gender.rawValue)")
+                    Text("Sistema IPF • \(dataManager.userProfile.gender.rawValue) \(dataManager.userProfile.equipmentType.rawValue)")
                         .font(.system(size: 12))
                         .foregroundColor(AppColors.textSecondary)
                 }
@@ -366,6 +369,21 @@ struct IPFGLPointsSection: View {
                             Capsule()
                                 .fill(ipfRating.1.opacity(0.2))
                         )
+                }
+            }
+            
+            // Scale di riferimento IPF
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Scala IPF:")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(AppColors.textSecondary)
+                
+                HStack(spacing: 4) {
+                    IPFScaleItem(range: "<70", label: "Untrained", color: .gray, current: ipfGL)
+                    IPFScaleItem(range: "70-79", label: "Beginner", color: .blue, current: ipfGL)
+                    IPFScaleItem(range: "80-89", label: "Inter.", color: .purple, current: ipfGL)
+                    IPFScaleItem(range: "90-99", label: "Adv.", color: .orange, current: ipfGL)
+                    IPFScaleItem(range: "100+", label: "Elite", color: .red, current: ipfGL)
                 }
             }
         }
@@ -391,6 +409,45 @@ struct IPFGLPointsSection: View {
                     lineWidth: 1
                 )
         )
+    }
+}
+
+struct IPFScaleItem: View {
+    let range: String
+    let label: String
+    let color: Color
+    let current: Double
+    
+    var isActive: Bool {
+        if range == "<70" {
+            return current < 70
+        } else if range == "70-79" {
+            return current >= 70 && current < 80
+        } else if range == "80-89" {
+            return current >= 80 && current < 90
+        } else if range == "90-99" {
+            return current >= 90 && current < 100
+        } else if range == "100+" {
+            return current >= 100
+        }
+        return false
+    }
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(range)
+                .font(.system(size: 9, weight: isActive ? .bold : .regular))
+                .foregroundColor(isActive ? color : AppColors.textSecondary.opacity(0.5))
+            
+            Rectangle()
+                .fill(isActive ? color : AppColors.textSecondary.opacity(0.2))
+                .frame(height: 4)
+                .cornerRadius(2)
+            
+            Text(label)
+                .font(.system(size: 8))
+                .foregroundColor(isActive ? color : AppColors.textSecondary.opacity(0.5))
+        }
     }
 }
 
